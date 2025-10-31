@@ -1,0 +1,19 @@
+[project]
+name = "my-app"
+version = "0.1.0"
+description = "A modern Python project"
+authors = [{ name = "Marwan" }]
+readme = "README.md"
+requires-python = ">=3.12"
+dependencies = []
+
+[project.scripts]
+my-app = "my-app.main:main"
+
+[tool.uv]
+
+[tool.black]
+line-length = 100
+
+[tool.ruff]
+line-length = 100

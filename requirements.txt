@@ -1,0 +1,2 @@
+# Pin runtime deps here if you prefer requirements.txt.
+# (uv also reads this when you call: uv pip install -r requirements.txt)
