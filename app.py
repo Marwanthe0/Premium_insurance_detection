@@ -11,6 +11,59 @@ with open("model.pkl", "rb") as f:
 # Assigning the app for fastapi
 app = FastAPI()
 
+# List of cities by their tiers
+tier_1 = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Pune"]
+tier_2 = [
+    "Jaipur",
+    "Chandigarh",
+    "Indore",
+    "Lucknow",
+    "Patna",
+    "Ranchi",
+    "Visakhapatnam",
+    "Coimbatore",
+    "Bhopal",
+    "Nagpur",
+    "Vadodara",
+    "Surat",
+    "Rajkot",
+    "Jodhpur",
+    "Raipur",
+    "Amritsar",
+    "Varanasi",
+    "Agra",
+    "Dehradun",
+    "Mysore",
+    "Jabalpur",
+    "Guwahati",
+    "Thiruvananthapuram",
+    "Ludhiana",
+    "Nashik",
+    "Allahabad",
+    "Udaipur",
+    "Aurangabad",
+    "Hubli",
+    "Belgaum",
+    "Salem",
+    "Vijayawada",
+    "Tiruchirappalli",
+    "Bhavnagar",
+    "Gwalior",
+    "Dhanbad",
+    "Bareilly",
+    "Aligarh",
+    "Gaya",
+    "Kozhikode",
+    "Warangal",
+    "Kolhapur",
+    "Bilaspur",
+    "Jalandhar",
+    "Noida",
+    "Guntur",
+    "Asansol",
+    "Siliguri",
+]
+
 
 # Data Validation using pydantic_class
 class UserInput(BaseModel):
@@ -38,3 +91,40 @@ class UserInput(BaseModel):
         ],
         Field(..., description="Occupation of the user"),
     ]
+    #generating features from the user input
+    @computed_field
+    @property
+    def bmi(self) -> float:
+        return self.weight / (self.height**2)
+
+    @computed_field
+    @property
+    def lifestyle_risk(self) -> str:
+        if self.smoker and self.bmi > 30:
+            return "high"
+        elif self.smoker and self.bmi > 27:
+            return "medium"
+        else:
+            return "low"
+
+    @computed_field
+    @property
+    def age_group(self):
+        if self.age < 25:
+            return "Young"
+        elif self.age < 45:
+            return "Adult"
+        elif self.age < 60:
+            return "Middle_Aged"
+        else:
+            return "Senior"
+
+    @computed_field
+    @property
+    def city_tier(self):
+        if self.city in tier_1:
+            return 1
+        elif self.city in tier_2:
+            return 2
+        else:
+            return 3
