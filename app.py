@@ -9,7 +9,7 @@ import pandas as pd
 # Opening the ML model using pickle
 with open("model.pkl", "rb") as f:
     model = pickle.load(f)
-# Assigning the app for fastapi
+# Assigning the fastapi object in the app
 app = FastAPI()
 
 # List of cities by their tiers
@@ -111,7 +111,7 @@ class UserInput(BaseModel):
 
     @computed_field
     @property
-    def age_group(self):
+    def age_group(self) -> str:
         if self.age < 25:
             return "Young"
         elif self.age < 45:
@@ -123,7 +123,7 @@ class UserInput(BaseModel):
 
     @computed_field
     @property
-    def city_tier(self):
+    def city_tier(self) -> int:
         if self.city in tier_1:
             return 1
         elif self.city in tier_2:
