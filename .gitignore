@@ -67,9 +67,14 @@ target/
 .idea
 
 # VS Code
+# IDE
 .vscode/
-*.code-workspace
-
+.idea/
+*.swp
+*.swo
+*.code-workspace    # VS Code workspace files
+.settings/         # VS Code settings directory
+*.sublime-*        # Sublime Text files
 # Spyder
 .spyproject/
 
