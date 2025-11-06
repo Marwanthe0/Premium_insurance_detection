@@ -26,5 +26,34 @@ occcupation = st.selectbox(
         "business_owner",
         "unemployed",
         "private_job",
-    ]
+    ],
 )
+
+if st.button("Predict Insurance Premium Category"):
+    input_data = {
+        "age": age,
+        "weight": weight,
+        "height": height,
+        "income_lpa": income_lpa,
+        "smoker": smoker,
+        "city": city,
+        "occcupation": occcupation,
+    }
+
+    try:
+        response = requests.post(API_URL, json=input_data)
+        result = response.json()
+
+        if response.status_code == 200 and "response" in result:
+            prediction = result["response"]
+            st.success(
+                f"Predicted INsurance Premium Category: **{prediction['predicted_category']}**"
+            )
+            st.write("🔍 Confidence:", prediction["confidence"])
+            st.write("📊 Class Probabilities:")
+            st.json(prediction["class_probabilities"])
+        else:
+            st.error(f"API Error: {response.status_code}")
+            st.write(result)
+    except requests.exceptions.ConnectionError:
+        st.error("❌ Could not connect to the FastAPI server. Make sure it's running.")
