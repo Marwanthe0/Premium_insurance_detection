@@ -16,7 +16,7 @@ height = st.number_input("Height", min_value=0.5, max_value=2.5, value=1.7)
 income_lpa = st.number_input("Annual income in Lakhs(LPA)", min_value=0.0, value=8.0)
 smoker = st.selectbox("Are you a smoker", options=[True, False])
 city = st.text_input("City", value="Mumbai")
-occcupation = st.selectbox(
+occupation = st.selectbox(
     "Occupation",
     options=[
         "retired",
@@ -37,7 +37,7 @@ if st.button("Predict Insurance Premium Category"):
         "income_lpa": income_lpa,
         "smoker": smoker,
         "city": city,
-        "occcupation": occcupation,
+        "occupation": occupation,
     }
 
     try:
@@ -49,9 +49,9 @@ if st.button("Predict Insurance Premium Category"):
             st.success(
                 f"Predicted INsurance Premium Category: **{prediction['predicted_category']}**"
             )
-            st.write("🔍 Confidence:", prediction["confidence"])
-            st.write("📊 Class Probabilities:")
-            st.json(prediction["class_probabilities"])
+            # st.write("🔍 Confidence:", prediction["confidence"])
+            # st.write("📊 Class Probabilities:")
+            # st.json(prediction["class_probabilities"])
         else:
             st.error(f"API Error: {response.status_code}")
             st.write(result)
