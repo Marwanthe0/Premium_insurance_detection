@@ -53,7 +53,8 @@ if st.button("Predict Insurance Premium Category"):
             # st.write("📊 Class Probabilities:")
             # st.json(prediction["class_probabilities"])
         else:
-            st.error(f"API Error: {response.status_code}")
-            st.write(result)
+            code = response.status_code
+            st.error(f"Error: {code}")
+            st.write("Error occured:",result["detail"][0]["loc"][1], "-", result["detail"][0]["msg"])
     except requests.exceptions.ConnectionError:
         st.error("❌ Could not connect to the FastAPI server. Make sure it's running.")
