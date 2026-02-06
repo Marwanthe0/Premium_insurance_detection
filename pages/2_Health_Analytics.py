@@ -3,15 +3,13 @@ import pandas as pd
 import matplotlib.pyplot as plt
 import seaborn as sns
 
-# ---------- Page config ----------
 st.set_page_config(page_title="Insurance Analytics", page_icon="📊", layout="centered")
 
 st.title("📊 Insurance Dataset Analytics")
-# ---------- Load dataset ----------
+#Load dataset
 df = pd.read_csv("insurance.csv")
 df["bmi"] = df["weight"] / (df["height"] ** 2)
 
-# ---------- Global styling (key fix) ----------
 sns.set_theme(
     style="darkgrid",
     rc={
@@ -25,17 +23,15 @@ sns.set_theme(
     },
 )
 
-FIG_SIZE = (6, 3.5)  # compact dashboard-sized plots
+FIG_SIZE = (6, 3.5) 
 
-# ---------- Dataset preview ----------
+#Dataset preview
 st.subheader("🔍 Dataset Preview")
 st.dataframe(df.head(), use_container_width=True)
 
 st.divider()
 
-# =======================
 # Chart 1: Age Distribution
-# =======================
 st.subheader("📈 Age Distribution")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)
@@ -45,9 +41,7 @@ ax.set_ylabel("Count")
 st.pyplot(fig)
 plt.close(fig)
 
-# =======================
 # Chart 2: BMI vs Premium Category
-# =======================
 st.subheader("⚖️ BMI vs Insurance Premium Category")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)
@@ -57,9 +51,7 @@ ax.set_ylabel("BMI")
 st.pyplot(fig)
 plt.close(fig)
 
-# =======================
 # Chart 3: Smoker vs Premium Category
-# =======================
 st.subheader("🚬 Smoker vs Premium Category")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)
@@ -75,9 +67,7 @@ ax.set_ylabel("Count")
 st.pyplot(fig)
 plt.close(fig)
 
-# =======================
 # Chart 4: Income vs Premium Category
-# =======================
 st.subheader("💰 Income vs Premium Category")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)

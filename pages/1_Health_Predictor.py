@@ -3,7 +3,7 @@ import streamlit as st
 import requests
 from typing import Dict
 
-# Page config & header styling (web-dev vibes)
+# Page config & header styling
 st.set_page_config(
     page_title="Insurance Premium Predictor",
     page_icon="🏥",
@@ -44,11 +44,9 @@ st.write(
     "Enter your details below. The model runs on a FastAPI backend — make sure the API is running first. 🔌"
 )
 
-# default API URL (allow override)
 API_URL = "http://127.0.0.1:8000/health/predict"
 
 
-# quick-fill sample presets
 preset = st.selectbox(
     "Quick sample",
     options=["— choose —", "Typical Adult", "Young Smoker", "Senior High Risk"],
@@ -86,7 +84,7 @@ elif preset == "Senior High Risk":
 else:
     default_values = {}
 
-# layout columns for nicer form
+# layout columns
 with st.form("input_form"):
     col1, col2 = st.columns(2)
     with col1:
@@ -190,7 +188,6 @@ if submit:
                 st.error("Invalid JSON response from server.")
                 st.stop()
 
-            # expected structure: {"response":{"predicted_category":"..."}}
             if "predicted_category" not in data:
                 st.error("Unexpected API response format.")
                 st.write(data)
@@ -212,7 +209,6 @@ if submit:
                 )
 
         else:
-            # show helpful error message if API returned a structured validation error
             try:
                 err = r.json()
             except Exception:

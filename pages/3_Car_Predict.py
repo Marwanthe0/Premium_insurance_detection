@@ -7,10 +7,7 @@ st.set_page_config(
     page_title="Car Insurance Category Predict", page_icon="🚗", layout="centered"
 )
 
-st.title("🚗 Car Insurance — Predict (dataset fields only)")
-st.write("This form asks only the exact features the Car model was trained on.")
-
-API_URL = st.text_input("API URL", value="http://127.0.0.1:8000/car/predict")
+st.title("🚗 Car Insurance — Predict")
 
 st.info(
     "Enter annual mileage in *thousands* of km. e.g., 120 means 120,000 km (so input 120.0)."

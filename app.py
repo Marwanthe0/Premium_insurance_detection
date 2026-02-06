@@ -1,4 +1,3 @@
-# app.py
 import logging
 import os
 import joblib
@@ -30,17 +29,12 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# -----------------------
-# models registry
-# -----------------------
 models = {"health": None, "car": None}
 models_loaded = {"health": False, "car": False}
 sklearn_version: Optional[str] = None
 
 
-# -----------------------
-# try to load models at startup (joblib first)
-# -----------------------
+# Model Loading
 @app.on_event("startup")
 def load_models():
     global sklearn_version
@@ -66,7 +60,7 @@ def load_models():
     else:
         logger.warning("Health model not found at %s", health_path)
 
-    # car model (required for car endpoint functionality)
+    # car model
     car_path = "models/car_insurance_model.pkl"
     if os.path.exists(car_path):
         try:
@@ -81,9 +75,6 @@ def load_models():
         logger.warning("Car model not found at %s", car_path)
 
 
-# -----------------------
-# Health input (unchanged semantics)
-# -----------------------
 tier_1 = [...]
 tier_2 = [...]
 
@@ -147,9 +138,7 @@ class HealthUserInput(BaseModel):
             return 3
 
 
-# -----------------------
-# CAR input: only the dataset features (minimal)
-# -----------------------
+# CAR input:
 class CarUserInput(BaseModel):
     # These are the exact minimal inputs you requested (no extras)
     driver_age: Annotated[int, Field(..., ge=16, le=120)]
@@ -160,9 +149,7 @@ class CarUserInput(BaseModel):
     car_age: Annotated[int, Field(..., ge=0)]
 
 
-# -----------------------
 # Health check endpoint
-# -----------------------
 @app.get("/health")
 def health():
     return {
@@ -171,9 +158,7 @@ def health():
     }
 
 
-# -----------------------
-# Health predict (keeps original logic)
-# -----------------------
+# Health predict
 @app.post("/health/predict")
 def predict_health(data: HealthUserInput):
     if not models_loaded["health"] or models["health"] is None:
@@ -213,12 +198,7 @@ def predict_health(data: HealthUserInput):
     )
 
 
-# -----------------------
-# Car predict (minimal dataset-matching inputs; NO extra fields)
-# We will build a DataFrame whose column names match the dataset exactly:
-#   'Driver Age', 'Driver Experience', 'Previous Accidents',
-#   'Annual Mileage (x1000 km)', 'Car Manufacturing Year', 'Car Age'
-# -----------------------
+# Car predict
 @app.post("/car/predict")
 def predict_car(data: CarUserInput):
     if not models_loaded["car"] or models["car"] is None:
@@ -226,8 +206,6 @@ def predict_car(data: CarUserInput):
 
     raw = data.model_dump()
     logger.info("Car raw payload: %s", raw)
-
-    # Create DataFrame using the exact dataset column names:
     mapped = {
         "Driver Age": raw["driver_age"],
         "Driver Experience": raw["driver_experience"],
@@ -250,7 +228,6 @@ def predict_car(data: CarUserInput):
             prob = None
     except Exception as e:
         logger.exception("Car prediction error: %s", e)
-        # show dev-friendly message; in prod consider hiding internals
         raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
 
     return JSONResponse(
