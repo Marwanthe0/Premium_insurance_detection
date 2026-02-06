@@ -6,7 +6,7 @@ import seaborn as sns
 st.set_page_config(page_title="Insurance Analytics", page_icon="📊", layout="centered")
 
 st.title("📊 Insurance Dataset Analytics")
-#Load dataset
+# Load dataset
 df = pd.read_csv("insurance.csv")
 df["bmi"] = df["weight"] / (df["height"] ** 2)
 
@@ -23,14 +23,15 @@ sns.set_theme(
     },
 )
 
-FIG_SIZE = (6, 3.5) 
+FIG_SIZE = (6, 3.5)
 
-#Dataset preview
+# Dataset preview
 st.subheader("🔍 Dataset Preview")
 st.dataframe(df.head(), use_container_width=True)
 
 st.divider()
 
+order = ["Low", "Medium", "High"]
 # Chart 1: Age Distribution
 st.subheader("📈 Age Distribution")
 
@@ -45,7 +46,9 @@ plt.close(fig)
 st.subheader("⚖️ BMI vs Insurance Premium Category")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)
-sns.boxplot(x="insurance_premium_category", y="bmi", data=df, palette="cool", ax=ax)
+sns.boxplot(
+    x="insurance_premium_category", y="bmi", order=order, data=df, palette="cool", ax=ax
+)
 ax.set_xlabel("Premium Category")
 ax.set_ylabel("BMI")
 st.pyplot(fig)
@@ -53,11 +56,11 @@ plt.close(fig)
 
 # Chart 3: Smoker vs Premium Category
 st.subheader("🚬 Smoker vs Premium Category")
-
 fig, ax = plt.subplots(figsize=FIG_SIZE)
 sns.countplot(
     x="insurance_premium_category",
     hue="smoker",
+    order=order,
     data=df,
     palette=["#22c55e", "#ef4444"],
     ax=ax,
@@ -72,7 +75,12 @@ st.subheader("💰 Income vs Premium Category")
 
 fig, ax = plt.subplots(figsize=FIG_SIZE)
 sns.boxplot(
-    x="insurance_premium_category", y="income_lpa", data=df, palette="viridis", ax=ax
+    x="insurance_premium_category",
+    y="income_lpa",
+    order=order,
+    data=df,
+    palette="viridis",
+    ax=ax,
 )
 ax.set_xlabel("Premium Category")
 ax.set_ylabel("Income (LPA)")

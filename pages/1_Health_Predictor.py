@@ -40,22 +40,20 @@ st.markdown(
     '<div class="header">🏥 Insurance Premium Category Predictor — FastAPI + ML</div>',
     unsafe_allow_html=True,
 )
-st.write(
-    "Enter your details below. The model runs on a FastAPI backend — make sure the API is running first. 🔌"
-)
+st.write("Enter your details below. The model runs on a FastAPI backend")
 
 API_URL = "http://127.0.0.1:8000/health/predict"
 
 
 preset = st.selectbox(
     "Quick sample",
-    options=["— choose —", "Typical Adult", "Young Smoker", "Senior High Risk"],
+    options=["Choose", "Typical Adult", "Young Smoker", "Senior Unhealthy"],
 )
 if preset == "Typical Adult":
     default_values = {
-        "age": 30,
-        "weight": 70.0,
-        "height": 5.6,
+        "age": 25,
+        "weight": 60.0,
+        "height": 5.8,
         "income_lpa": 6.0,
         "smoker": "No",
         "city": "Dhaka",
@@ -71,12 +69,12 @@ elif preset == "Young Smoker":
         "city": "Dhaka",
         "occupation": "student",
     }
-elif preset == "Senior High Risk":
+elif preset == "Senior Unhealthy":
     default_values = {
-        "age": 62,
+        "age": 70,
         "weight": 85.0,
         "height": 5.4,
-        "income_lpa": 12.0,
+        "income_lpa": 5.0,
         "smoker": "Yes",
         "city": "Dhaka",
         "occupation": "retired",
