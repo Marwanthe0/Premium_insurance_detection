@@ -106,6 +106,7 @@ class UserInput(BaseModel):
             "business_owner",
             "unemployed",
             "private_job",
+            "Others",
         ],
         Field(..., description="Occupation of the user"),
     ]
@@ -114,7 +115,7 @@ class UserInput(BaseModel):
     @computed_field
     @property
     def bmi(self) -> float:
-        return self.weight / (self.height**2)
+        return self.weight / ((self.height * 0.3048) ** 2)
 
     @computed_field
     @property

@@ -12,10 +12,10 @@ st.markdown("Enter your details below")
 # Input fields
 age = st.number_input("Age", min_value=1, max_value=119, value=30)
 weight = st.number_input("Weight", min_value=1.0, value=60.0)
-height = st.number_input("Height", min_value=0.5, max_value=2.5, value=1.7)
+height = st.number_input("Height (In Feet)", min_value=3.5, max_value=7, value=5.5)
 income_lpa = st.number_input("Annual income in Lakhs(LPA)", min_value=0.0, value=8.0)
 smoker = st.selectbox("Are you a smoker", options=[True, False])
-city = st.text_input("City", value="Mumbai")
+city = st.text_input("City", value="Dhaka")
 occupation = st.selectbox(
     "Occupation",
     options=[
@@ -26,6 +26,7 @@ occupation = st.selectbox(
         "business_owner",
         "unemployed",
         "private_job",
+        "Others",
     ],
 )
 
@@ -52,6 +53,11 @@ if st.button("Predict Insurance Premium Category"):
         else:
             code = response.status_code
             st.error(f"Error: {code}")
-            st.write("Error occured:",result["detail"][0]["loc"][1], "-", result["detail"][0]["msg"])
+            st.write(
+                "Error occured:",
+                result["detail"][0]["loc"][1],
+                "-",
+                result["detail"][0]["msg"],
+            )
     except requests.exceptions.ConnectionError:
         st.error("❌ Could not connect to the FastAPI server. Make sure it's running.")
