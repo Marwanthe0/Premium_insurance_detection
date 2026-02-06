@@ -45,7 +45,7 @@ st.write(
 )
 
 # default API URL (allow override)
-API_URL = "http://127.0.0.1:8000/predict"
+API_URL = "http://127.0.0.1:8000/health/predict"
 
 
 # quick-fill sample presets
@@ -191,15 +191,23 @@ if submit:
                 st.stop()
 
             # expected structure: {"response":{"predicted_category":"..."}}
-            resp = data.get("response")
-            if not resp or "predicted_category" not in resp:
-                st.error("Unexpected API response format. See console for details.")
+            if "predicted_category" not in data:
+                st.error("Unexpected API response format.")
                 st.write(data)
             else:
-                prediction = resp["predicted_category"]
-                st.success(f"✅ Predicted Insurance Premium Category: ")
+                prediction = data["predicted_category"]
+                confidence = data.get("confidence")
+
+                st.success("✅ Predicted Insurance Premium Category")
                 st.markdown(
-                    f"<div class='card'><div class='result-badge'>🔹 {prediction}</div><div class='small-muted'>Model prediction — interpret carefully.</div></div>",
+                    f"""
+                    <div class='card'>
+                        <div class='result-badge'>🔹 {prediction}</div>
+                        <div class='small-muted'>
+                            Confidence: {round(confidence * 100, 2) if confidence else "N/A"}%
+                        </div>
+                    </div>
+                    """,
                     unsafe_allow_html=True,
                 )
 

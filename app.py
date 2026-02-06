@@ -1,6 +1,7 @@
 # app.py
 import logging
-import pickle
+import os
+import joblib
 from typing import Literal, Annotated, Optional
 from fastapi import FastAPI, HTTPException
 from fastapi.responses import JSONResponse
@@ -12,15 +13,15 @@ logger = logging.getLogger("uvicorn.error")
 
 app = FastAPI(
     title="Insurance Premium Predictor API",
-    description="Predict insurance premium category from user features.",
+    description="Health & Car insurance premium category prediction API",
     version="1.0.0",
 )
 
-# Allow requests from Streamlit and local dev tools
+# allow local frontends
 app.add_middleware(
     CORSMiddleware,
     allow_origins=[
-        "http://localhost:8501",  # streamlit default
+        "http://localhost:8501",
         "http://127.0.0.1:8501",
         "http://localhost:3000",
         "http://127.0.0.1:3000",
@@ -29,44 +30,65 @@ app.add_middleware(
     allow_headers=["*"],
 )
 
-# global model holder
-model = None
-model_loaded = False
+# -----------------------
+# models registry
+# -----------------------
+models = {"health": None, "car": None}
+models_loaded = {"health": False, "car": False}
 sklearn_version: Optional[str] = None
 
 
+# -----------------------
+# try to load models at startup (joblib first)
+# -----------------------
 @app.on_event("startup")
-def load_model_on_startup():
-    global model, model_loaded, sklearn_version
+def load_models():
+    global sklearn_version
     try:
-        # optional: log installed sklearn version
+        import sklearn
+
+        sklearn_version = sklearn.__version__
+        logger.info("scikit-learn version: %s", sklearn_version)
+    except Exception:
+        sklearn_version = None
+
+    # health model (optional)
+    health_path = "models/health_insurance_model.pkl"
+    if os.path.exists(health_path):
         try:
-            import sklearn
+            models["health"] = joblib.load(health_path)
+            models_loaded["health"] = True
+            logger.info("Loaded health model from %s", health_path)
+        except Exception as e:
+            models["health"] = None
+            models_loaded["health"] = False
+            logger.exception("Failed to load health model: %s", e)
+    else:
+        logger.warning("Health model not found at %s", health_path)
 
-            sklearn_version = sklearn.__version__
-            logger.info("scikit-learn installed: %s", sklearn_version)
-        except Exception:
-            sklearn_version = None
-            logger.warning("Could not determine installed scikit-learn version.")
-
-        # load the pickled model (wrap errors)
-        with open("models/model.pkl", "rb") as f:
-            model = pickle.load(f)
-
-        model_loaded = True
-        logger.info("Model loaded successfully.")
-    except Exception as e:
-        model = None
-        model_loaded = False
-        logger.exception("Failed to load model at startup: %s", e)
+    # car model (required for car endpoint functionality)
+    car_path = "models/car_insurance_model.pkl"
+    if os.path.exists(car_path):
+        try:
+            models["car"] = joblib.load(car_path)
+            models_loaded["car"] = True
+            logger.info("Loaded car model from %s", car_path)
+        except Exception as e:
+            models["car"] = None
+            models_loaded["car"] = False
+            logger.exception("Failed to load car model: %s", e)
+    else:
+        logger.warning("Car model not found at %s", car_path)
 
 
-# City tiers (kept from your original data)
+# -----------------------
+# Health input (unchanged semantics)
+# -----------------------
 tier_1 = [...]
 tier_2 = [...]
 
 
-class UserInput(BaseModel):
+class HealthUserInput(BaseModel):
     age: Annotated[int, Field(..., gt=0, lt=120)]
     weight: Annotated[float, Field(..., gt=0)]
     height: Annotated[float, Field(..., gt=0)]
@@ -90,7 +112,6 @@ class UserInput(BaseModel):
     @computed_field
     @property
     def bmi(self) -> float:
-        # height is given in feet; convert to meters
         return self.weight / ((self.height * 0.3048) ** 2)
 
     @computed_field
@@ -126,26 +147,38 @@ class UserInput(BaseModel):
             return 3
 
 
+# -----------------------
+# CAR input: only the dataset features (minimal)
+# -----------------------
+class CarUserInput(BaseModel):
+    # These are the exact minimal inputs you requested (no extras)
+    driver_age: Annotated[int, Field(..., ge=16, le=120)]
+    driver_experience: Annotated[int, Field(..., ge=0)]
+    previous_accidents: Annotated[int, Field(..., ge=0)]
+    annual_mileage_x1000: Annotated[float, Field(..., ge=0.0)]
+    car_manufacturing_year: Annotated[int, Field(..., ge=1900, le=2100)]
+    car_age: Annotated[int, Field(..., ge=0)]
+
+
+# -----------------------
+# Health check endpoint
+# -----------------------
 @app.get("/health")
 def health():
-    """Simple health check to verify the model and environment."""
     return {
-        "status": "ok" if model_loaded else "model_not_loaded",
-        "model_loaded": model_loaded,
+        "models_loaded": {k: v for k, v in models_loaded.items()},
         "sklearn_version": sklearn_version,
     }
 
 
-@app.post("/predict")
-def predict_premium(data: UserInput):
-    """Predict endpoint. Returns 503 if model failed to load at startup."""
-    if not model_loaded or model is None:
-        logger.error("Prediction requested but model not loaded.")
-        raise HTTPException(
-            status_code=503, detail="Model not loaded. Check server logs."
-        )
+# -----------------------
+# Health predict (keeps original logic)
+# -----------------------
+@app.post("/health/predict")
+def predict_health(data: HealthUserInput):
+    if not models_loaded["health"] or models["health"] is None:
+        raise HTTPException(status_code=503, detail="Health model not loaded")
 
-    # build dataframe matching training feature layout
     input_df = pd.DataFrame(
         [
             {
@@ -160,11 +193,70 @@ def predict_premium(data: UserInput):
     )
 
     try:
-        prediction = model.predict(input_df)[0]
+        model = models["health"]
+        pred = model.predict(input_df)[0]
+        prob = None
+        try:
+            prob = float(model.predict_proba(input_df).max())
+        except Exception:
+            prob = None
     except Exception as e:
-        logger.exception("Error during model prediction: %s", e)
-        raise HTTPException(status_code=500, detail="Error during model prediction.")
+        logger.exception("Health prediction error: %s", e)
+        raise HTTPException(status_code=500, detail="Prediction failed")
 
     return JSONResponse(
-        status_code=200, content={"response": {"predicted_category": str(prediction)}}
+        content={
+            "insurance_type": "health",
+            "predicted_category": str(pred),
+            "confidence": round(prob, 3) if prob is not None else None,
+        }
+    )
+
+
+# -----------------------
+# Car predict (minimal dataset-matching inputs; NO extra fields)
+# We will build a DataFrame whose column names match the dataset exactly:
+#   'Driver Age', 'Driver Experience', 'Previous Accidents',
+#   'Annual Mileage (x1000 km)', 'Car Manufacturing Year', 'Car Age'
+# -----------------------
+@app.post("/car/predict")
+def predict_car(data: CarUserInput):
+    if not models_loaded["car"] or models["car"] is None:
+        raise HTTPException(status_code=503, detail="Car model not loaded")
+
+    raw = data.model_dump()
+    logger.info("Car raw payload: %s", raw)
+
+    # Create DataFrame using the exact dataset column names:
+    mapped = {
+        "Driver Age": raw["driver_age"],
+        "Driver Experience": raw["driver_experience"],
+        "Previous Accidents": raw["previous_accidents"],
+        "Annual Mileage (x1000 km)": raw["annual_mileage_x1000"],
+        "Car Manufacturing Year": raw["car_manufacturing_year"],
+        "Car Age": raw["car_age"],
+    }
+
+    input_df = pd.DataFrame([mapped])
+    logger.info("Prepared input_df columns: %s", list(input_df.columns))
+
+    try:
+        model = models["car"]
+        pred = model.predict(input_df)[0]
+        prob = None
+        try:
+            prob = float(model.predict_proba(input_df).max())
+        except Exception:
+            prob = None
+    except Exception as e:
+        logger.exception("Car prediction error: %s", e)
+        # show dev-friendly message; in prod consider hiding internals
+        raise HTTPException(status_code=500, detail=f"Prediction failed: {str(e)}")
+
+    return JSONResponse(
+        content={
+            "insurance_type": "car",
+            "predicted_category": str(pred),
+            "confidence": round(prob, 3) if prob is not None else None,
+        }
     )
