@@ -1,4 +1,3 @@
-# pages/3_Car_Predict.py
 import streamlit as st
 import requests
 from typing import Dict
@@ -49,6 +48,7 @@ def build_payload() -> Dict:
     }
 
 
+API_URL = "http://127.0.0.1:8000/car/predict"
 if submit:
     payload = build_payload()
     st.write("Sending payload to API:")
@@ -85,8 +85,8 @@ if submit:
                 if conf is not None:
                     st.info(f"Confidence: {round(float(conf) * 100, 2)}%")
                 advice = {
-                    "Low": "Low risk — standard premium expected.",
-                    "Medium": "Medium risk — consider inspection.",
-                    "High": "High risk — higher premium likely.",
+                    "Low": "Low risk, standard premium expected.",
+                    "Medium": "Medium risk, consider inspection.",
+                    "High": "High risk, higher premium likely.",
                 }
                 st.write(advice.get(pred, "Interpret result carefully."))
