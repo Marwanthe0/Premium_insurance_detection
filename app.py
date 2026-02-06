@@ -13,8 +13,25 @@ with open("model.pkl", "rb") as f:
 app = FastAPI()
 
 # List of cities by their tiers
-tier_1 = ["Mumbai", "Delhi", "Bangalore", "Chennai", "Kolkata", "Hyderabad", "Pune"]
+tier_1 = [
+    "Mumbai",
+    "Delhi",
+    "Bangalore",
+    "Chennai",
+    "Kolkata",
+    "Hyderabad",
+    "Pune",
+    "Dhaka",
+    "Sylhet",
+    "Chattogram",
+]
 tier_2 = [
+    "Khulna",
+    "Rajshahi",
+    "Barishal",
+    "Rangpur",
+    "Mymensingh",
+    "Comilla",
     "Jaipur",
     "Chandigarh",
     "Indore",
