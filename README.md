@@ -2,6 +2,12 @@
 
 A concise project that detects insurance premium categories using a FastAPI backend, a Streamlit frontend, Pandas for data processing, and a scikit-learn RandomForest model.
 
+## Live Demo
+
+Try the deployed app directly on Hugging Face Spaces:
+
+[Insurance Category Predictor](https://huggingface.co/spaces/marwanthe0/Insurance_Category_predictor)
+
 ## Features
 - Predict insurance premium category from user-provided features
 - Batch and single-record prediction endpoints
