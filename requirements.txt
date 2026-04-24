@@ -1,8 +1,8 @@
-fastapi
-uvicorn
-streamlit
-pydantic
-numpy
-pandas
+fastapi==0.115.12
+uvicorn[standard]==0.30.6
+streamlit==1.44.1
+pydantic==2.11.4
+numpy==2.2.5
+pandas==2.2.3
 scikit-learn==1.6.1
-joblib
+joblib==1.4.2
