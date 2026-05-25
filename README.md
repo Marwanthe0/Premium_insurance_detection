@@ -26,33 +26,90 @@
 ---
 
 ## 🏗️ Architecture
+
+### System Architecture Diagram
+```
 User Input (Streamlit UI)
-↓
-FastAPI Backend  ←→  RandomForest Model (.pkl)
-↓
-Prediction Response
-↓
-Streamlit Results Page + Analytics
+           ↓
+    ┌──────────────┐
+    │  Streamlit   │
+    │  Frontend    │
+    └──────┬───────┘
+           ↓
+    ┌──────────────────┐
+    │   FastAPI        │
+    │   Backend        │
+    └──────┬───────────┘
+           ↓
+    ┌──────────────────────┐
+    │  Model Inference     │
+    │  ├─ health_model.pkl │
+    │  └─ car_model.pkl    │
+    └──────┬───────────────┘
+           ↓
+    Prediction Response
+           ↓
+    Results + Analytics
+```
+
+### Component Overview
+| Component | Technology | Purpose |
+|-----------|-----------|---------|
+| **Frontend** | Streamlit | User interface for predictions & analytics |
+| **Backend** | FastAPI | REST API for model inference |
+| **Models** | scikit-learn (RandomForest) | ML models for category prediction |
+| **Data Processing** | pandas, joblib | Data loading & model serialization |
 
 ---
 
 ## 🗂️ Project Structure
+
+```
 Insurance_Category_Predictor/
 │
-├── app.py                  # Streamlit frontend (main entry)
-├── Home.py                 # Landing page component
-├── pages/                  # Multi-page Streamlit app
-│   ├── health_predict.py   # Health insurance prediction page
-│   └── car_predict.py      # Car insurance prediction page
-├── models/                 # Serialized model files
-│   ├── health_model.pkl
-│   └── car_model.pkl
-├── ml-model.ipynb          # Model training notebook (health)
-├── car_ml_model.py         # Model training script (car)
-├── insurance.csv           # Health insurance dataset
-├── Car_Dataset.csv         # Car insurance dataset
-├── requirements.txt        # Dependencies
-└── README.md
+├── 📄 app.py                      # Streamlit main entry point
+├── 📄 Home.py                     # Landing page component
+│
+├── 📁 pages/                      # Multi-page Streamlit app
+│   ├── health_predict.py          # Health insurance prediction UI
+│   └── car_predict.py             # Car insurance prediction UI
+│
+├── 📁 models/                     # Serialized ML models
+│   ├── health_model.pkl           # Trained RandomForest (health)
+│   └── car_model.pkl              # Trained RandomForest (car)
+│
+├── 📁 data/                       # Datasets (if applicable)
+│   ├── insurance.csv              # Health insurance dataset
+│   └── Car_Dataset.csv            # Car insurance dataset
+│
+├── 📁 notebooks/                  # Training & analysis notebooks
+│   ├── ml-model.ipynb             # Health model training pipeline
+│   └── car_ml_model.py            # Car model training script
+│
+├── 📄 requirements.txt            # Python dependencies
+├── 📄 main.py                     # FastAPI application (if using API)
+├── 📄 README.md                   # This file
+└── 📄 .gitignore
+
+```
+
+### Directory Details
+
+#### `/pages/` - Frontend Pages
+- **health_predict.py** — Input form + predictions for health insurance
+- **car_predict.py** — Input form + predictions for car insurance
+
+#### `/models/` - Serialized Models
+- **health_model.pkl** — Pre-trained RandomForest classifier for health insurance
+- **car_model.pkl** — Pre-trained RandomForest classifier for car insurance
+
+#### `/data/` - Source Datasets
+- **insurance.csv** — Health insurance dataset (training data)
+- **Car_Dataset.csv** — Car insurance dataset (training data)
+
+#### `/notebooks/` - Model Training & Development
+- **ml-model.ipynb** — Jupyter notebook for health model training & experimentation
+- **car_ml_model.py** — Python script for car model training
 
 ---
 
