@@ -1,73 +1,150 @@
-# Insurance Premium Category Detection
+<div align="center">
 
-A concise project that detects insurance premium categories using a FastAPI backend, a Streamlit frontend, Pandas for data processing, and a scikit-learn RandomForest model.
+# 🩺 Insurance Premium Category Predictor
 
-## Live Demo
+[![Python](https://img.shields.io/badge/Python-3.8+-3776AB?style=for-the-badge&logo=python&logoColor=white)](https://python.org)
+[![FastAPI](https://img.shields.io/badge/FastAPI-0.100+-009688?style=for-the-badge&logo=fastapi&logoColor=white)](https://fastapi.tiangolo.com)
+[![Streamlit](https://img.shields.io/badge/Streamlit-1.0+-FF4B4B?style=for-the-badge&logo=streamlit&logoColor=white)](https://streamlit.io)
+[![scikit-learn](https://img.shields.io/badge/scikit--learn-RandomForest-F7931E?style=for-the-badge&logo=scikit-learn&logoColor=white)](https://scikit-learn.org)
+[![HuggingFace](https://img.shields.io/badge/🤗-Live%20Demo-FFD21E?style=for-the-badge)](https://huggingface.co/spaces/marwanthe0/Insurance_Category_predictor)
 
-Try the deployed app directly on Hugging Face Spaces:
+**A full-stack ML application that predicts insurance premium categories (Low / Medium / High) for both health and car insurance using trained RandomForest models.**
 
-[Insurance Category Predictor](https://huggingface.co/spaces/marwanthe0/Insurance_Category_predictor)
+[🚀 Try Live Demo](https://huggingface.co/spaces/marwanthe0/Insurance_Category_predictor) · [📖 Report Bug](https://github.com/Marwanthe0/Insurance_Category_Predictor/issues) · [💡 Request Feature](https://github.com/Marwanthe0/Insurance_Category_Predictor/issues)
 
-## Features
-- Predict insurance premium category from user-provided features
-- Batch and single-record prediction endpoints
-- Reproducible training pipeline and evaluation metrics
-- Simple Streamlit UI for demo and manual testing
+</div>
 
-## Prerequisites
+## ✨ Features
+
+- **Dual Insurance Support** — Separate models for health insurance and car insurance
+- **Real-time Predictions** — Instant category output (Low / Medium / High)
+- **Interactive Analytics Dashboard** — Visual breakdown of prediction factors
+- **REST API Backend** — FastAPI with `/predict` and `/predict/batch` endpoints
+- **Streamlit Frontend** — Clean, user-friendly web interface
+- **Reproducible Pipeline** — Preprocessing + training notebooks included
+
+---
+
+## 🏗️ Architecture
+User Input (Streamlit UI)
+↓
+FastAPI Backend  ←→  RandomForest Model (.pkl)
+↓
+Prediction Response
+↓
+Streamlit Results Page + Analytics
+
+---
+
+## 🗂️ Project Structure
+Insurance_Category_Predictor/
+│
+├── app.py                  # Streamlit frontend (main entry)
+├── Home.py                 # Landing page component
+├── pages/                  # Multi-page Streamlit app
+│   ├── health_predict.py   # Health insurance prediction page
+│   └── car_predict.py      # Car insurance prediction page
+├── models/                 # Serialized model files
+│   ├── health_model.pkl
+│   └── car_model.pkl
+├── ml-model.ipynb          # Model training notebook (health)
+├── car_ml_model.py         # Model training script (car)
+├── insurance.csv           # Health insurance dataset
+├── Car_Dataset.csv         # Car insurance dataset
+├── requirements.txt        # Dependencies
+└── README.md
+
+---
+
+## ⚙️ Installation & Running Locally
+
+### Prerequisites
 - Python 3.8+
 - pip
 
-## Installation
-```sh
+### 1. Clone the repository
+```bash
+git clone https://github.com/Marwanthe0/Insurance_Category_Predictor.git
+cd Insurance_Category_Predictor
+```
+
+### 2. Create a virtual environment
+```bash
+python -m venv venv
+source venv/bin/activate        # On Windows: venv\Scripts\activate
+```
+
+### 3. Install dependencies
+```bash
 pip install -r requirements.txt
 ```
 
-### Dependencies
-- fastapi
-- uvicorn
-- streamlit
-- pandas
-- scikit-learn
-- joblib
-
-## Running the Application
-
-### Backend (FastAPI)
-```sh
-uvicorn main:app --reload
-```
-- API available at http://127.0.0.1:8000
-- API documentation at http://127.0.0.1:8000/docs
-
-### Frontend (Streamlit)
-```sh
+### 4. Run the Streamlit application
+```bash
 streamlit run app.py
 ```
-- Opens browser with interactive UI for predictions
+Visit: **http://localhost:8501**
 
-## Model Details
-- RandomForest classifier saved as `model.pkl`
-- Model loading and predictions handled by FastAPI backend
-- Update predictions by replacing `model.pkl` after retraining
-
-## Data Processing & Training
-- Data cleaning and preparation using pandas
-- Model training with scikit-learn RandomForest
-- Model serialization using joblib
-- Performance evaluation with standard metrics
-
-## API Endpoints
-- POST /predict - Single prediction (JSON)
-- POST /predict/batch - Batch predictions (CSV/JSON)
-- GET /health - Service status check
-
-## Project Structure
+### 5. (Optional) Run the FastAPI backend separately
+```bash
+uvicorn main:app --reload
 ```
-├── backend/         # FastAPI application
-├── frontend/        # Streamlit interface
-├── data/           # Dataset storage
-├── notebooks/      # Analysis notebooks
-└── models/         # Saved model files
-    └── model.pkl
+API docs at: **http://localhost:8000/docs**
+
+---
+
+## 🤖 Model Details
+
+| Feature | Health Model | Car Model |
+|---------|-------------|-----------|
+| Algorithm | Random Forest | Random Forest |
+| Target Classes | Low / Medium / High | Low / Medium / High |
+| Preprocessing | Label encoding, scaling | Label encoding, scaling |
+| Serialization | joblib (.pkl) | joblib (.pkl) |
+
+### Key Features Used
+
+**Health Insurance:** Age, BMI, Smoking status, Region, Number of dependents, Sex
+
+**Car Insurance:** Vehicle age, Annual mileage, Previous claims, Vehicle type, Coverage type
+
+---
+
+## 📡 API Endpoints
+
+| Method | Endpoint | Description |
+|--------|----------|-------------|
+| `GET` | `/health` | Service health check |
+| `POST` | `/predict` | Single prediction (JSON) |
+| `POST` | `/predict/batch` | Batch predictions (CSV/JSON) |
+
+**Example request:**
+```bash
+curl -X POST "http://localhost:8000/predict" \
+  -H "Content-Type: application/json" \
+  -d '{"age": 30, "bmi": 25.4, "smoker": "no", "region": "southwest", "children": 1}'
 ```
+
+**Example response:**
+```json
+{
+  "prediction": "Medium",
+  "confidence": 0.82
+}
+```
+
+---
+
+## 🙋 Author
+
+**Shafikul Islam Marwan**
+
+[![LinkedIn](https://img.shields.io/badge/LinkedIn-0A66C2?style=flat-square&logo=linkedin)](https://www.linkedin.com/in/marwanahmed27/)
+[![GitHub](https://img.shields.io/badge/GitHub-181717?style=flat-square&logo=github)](https://github.com/Marwanthe0)
+[![HuggingFace](https://img.shields.io/badge/HuggingFace-FFD21E?style=flat-square&logo=huggingface&logoColor=black)](https://huggingface.co/marwanthe0)
+
+---
+
+<div align="center">
+⭐ If you found this useful, please give it a star! It helps a lot.
+</div>
